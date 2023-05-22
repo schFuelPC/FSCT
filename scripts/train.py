@@ -272,6 +272,8 @@ class TrainModel:
         val_epoch_loss = 0
         val_epoch_acc = 0
 
+        torch.multiprocessing.set_start_method('spawn')
+
         for epoch in range(self.parameters["num_epochs"]):
             print("=====================================================================")
             print("EPOCH ", epoch)
@@ -362,16 +364,16 @@ class TrainModel:
 
 if __name__ == "__main__":
     parameters = dict(
-        preprocess_train_datasets=1,
-        preprocess_validation_datasets=1,
-        clean_sample_directories=1,  # Deletes all samples in the sample directories.
+        preprocess_train_datasets=1, #originally 1
+        preprocess_validation_datasets=1, #originally 1
+        clean_sample_directories=1,  # Deletes all samples in the sample directories. Originally 1
         perform_validation_during_training=1,
         generate_point_cloud_vis=0,  # Useful for visually checking how well the model is learning. Saves a set of samples called "latest_prediction.las" in the "FSCT/data/"" directory. Samples have label and prediction values.
         load_existing_model=1,
         num_epochs=2000,
         learning_rate=0.000025,
         input_point_cloud=None,
-        model_filename="modelV2.pth",
+        model_filename="model_Clonbinane.pth",
         sample_box_size_m=np.array([6, 6, 6]),
         sample_box_overlap=[0.5, 0.5, 0.5],
         min_points_per_box=1000,
