@@ -1,6 +1,6 @@
 from tools import load_file, save_file, get_fsct_path
 from model import Net
-from train_datasets import TrainingDataset, ValidationDataset
+from train_datasets_SH import TrainingDataset, ValidationDataset
 from fsct_exceptions import NoDataFound
 import numpy as np
 import torch
@@ -221,8 +221,7 @@ class TrainModel:
             train_dataset,
             batch_size=parameters["train_batch_size"],
             shuffle=True,
-            num_workers=0,
-            # num_workers=self.parameters["num_cpu_cores_deep_learning"],
+            num_workers=self.parameters["num_cpu_cores_deep_learning"],
             drop_last=True,
         )
 
@@ -239,8 +238,7 @@ class TrainModel:
                 validation_dataset,
                 batch_size=parameters["validation_batch_size"],
                 shuffle=True,
-                num_workers=0,
-                # num_workers=self.parameters["num_cpu_cores_deep_learning"],
+                num_workers=self.parameters["num_cpu_cores_deep_learning"],
                 drop_last=True,
             )
 
@@ -273,6 +271,8 @@ class TrainModel:
         criterion = nn.CrossEntropyLoss()
         val_epoch_loss = 0
         val_epoch_acc = 0
+
+        torch.multiprocessing.set_start_method('spawn')
 
         for epoch in range(self.parameters["num_epochs"]):
             print("=====================================================================")
@@ -365,8 +365,8 @@ class TrainModel:
 
 if __name__ == "__main__":
     parameters = dict(
-        preprocess_train_datasets=1,
-        preprocess_validation_datasets=1,
+        preprocess_train_datasets=0,
+        preprocess_validation_datasets=0,
         clean_sample_directories=1,  # Deletes all samples in the sample directories.
         perform_validation_during_training=1,
         generate_point_cloud_vis=0,  # Useful for visually checking how well the model is learning. Saves a set of samples called "latest_prediction.las" in the "FSCT/data/"" directory. Samples have label and prediction values.
@@ -374,7 +374,7 @@ if __name__ == "__main__":
         num_epochs=2000,
         learning_rate=0.000025,
         input_point_cloud=None,
-        model_filename="modelV2.pth",
+        model_filename="model_noterrain.pth",
         sample_box_size_m=np.array([6, 6, 6]),
         sample_box_overlap=[0.5, 0.5, 0.5],
         min_points_per_box=1000,
@@ -383,10 +383,11 @@ if __name__ == "__main__":
         subsampling_min_spacing=0.025,
         num_cpu_cores_preprocessing=0,  # 0 Means use all available cores.
         num_cpu_cores_deep_learning=1,  # Was originally set to 1. Setting this higher can cause CUDA issues on Windows.
-        train_batch_size=1, #Originally 2
-        validation_batch_size=1, #Originally 2
+        train_batch_size=2, #Originally 2
+        validation_batch_size=2, #Originally 2
         device="cuda",  # set to "cuda" or "cpu"
     )
 
     run_training = TrainModel(parameters)
+    print('finished prep')
     run_training.run_training()

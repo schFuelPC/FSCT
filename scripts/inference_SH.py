@@ -97,7 +97,7 @@ class SemanticSegmentation:
 
         test_loader = DataLoader(test_dataset, batch_size=self.parameters["batch_size"], shuffle=False, num_workers=0)
 
-        model = Net(num_classes=4).to(self.device)
+        model = Net(num_classes=3).to(self.device)
         if self.parameters["use_CPU_only"]:
             model.load_state_dict(
                 torch.load(
