@@ -57,11 +57,11 @@ def choose_most_confident_label(point_cloud, original_point_cloud):
     )
     _, indices = neighbours.kneighbors(original_point_cloud[:, :3])
 
-    labels = np.zeros((original_point_cloud.shape[0], 5))
-    labels[:, :4] = np.median(point_cloud[indices][:, :, -4:], axis=1)
-    labels[:, 4] = np.argmax(labels[:, :4], axis=1)
+    labels = np.zeros((original_point_cloud.shape[0], 4)) #Was originally 5
+    labels[:, :3] = np.median(point_cloud[indices][:, :, -3:], axis=1) #Were 4's
+    labels[:, 3] = np.argmax(labels[:, :3], axis=1) #Were 4's
 
-    original_point_cloud = np.hstack((original_point_cloud, labels[:, 4:]))
+    original_point_cloud = np.hstack((original_point_cloud, labels[:, 3:])) #Was 4
     return original_point_cloud
 
 
@@ -140,6 +140,17 @@ class SemanticSegmentation:
             self.directory + self.filename, headers_of_interest=["x", "y", "z", "red", "green", "blue"]
         )
         original_point_cloud[:, :2] = original_point_cloud[:, :2] - self.plot_centre
+        #Sam's addition start
+        self.output = self.output_point_cloud
+        self.output = np.asarray(self.output, dtype="float64")
+        self.output[:, :2] = self.output[:, :2] + self.plot_centre
+        save_file(
+            self.output_dir + "segmented_SH.las",
+            self.output,
+            headers_of_interest=["x", "y", "z", "red", "green", "blue", "label"],
+        )
+        #Sam's addition end
+
         self.output = choose_most_confident_label(self.output_point_cloud, original_point_cloud)
         self.output = np.asarray(self.output, dtype="float64")
         self.output[:, :2] = self.output[:, :2] + self.plot_centre

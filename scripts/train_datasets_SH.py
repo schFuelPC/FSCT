@@ -29,7 +29,7 @@ class TrainingDataset(Dataset):
         y = point_cloud[:, self.label_index] - 1
         x, y = augmentations(x, y, self.min_sample_points)
         # if np.all(y != 0):
-        #     print('triggered here')
+        #     print('triggered here because no ground - so cwd is relabelled as stem')
         #     y[y == 2] = 3  # if no ground is present, CWD is relabelled as stem.
         x = torch.from_numpy(x.copy()).type(torch.float).to(self.device)
         y = torch.from_numpy(y.copy()).type(torch.long).to(self.device)
@@ -119,12 +119,12 @@ def augmentations(x, y, min_sample_points):
             points = points + np.random.normal(0, random_noise_std_dev, size=(np.shape(points)[0], 3))
         return points
 
-    # if np.all(y != 0) and np.all(
-    #     y != 2
-    # ):  # if no terrain or CWD are present, it's ok to rotate extremely. Terrain shouldn't be above stems or CWD.
-    #     rotations = [np.random.uniform(-90, 90), np.random.uniform(-90, 90), np.random.uniform(-180, 180)]
-    # else:
-    rotations = [np.random.uniform(-25, 25), np.random.uniform(-25, 25), np.random.uniform(-180, 180)]
+    if np.all(y != 0) and np.all(
+        y != 2
+    ):  # if no terrain or CWD are present, it's ok to rotate extremely. Terrain shouldn't be above stems or CWD.
+        rotations = [np.random.uniform(-90, 90), np.random.uniform(-90, 90), np.random.uniform(-180, 180)]
+    else:
+        rotations = [np.random.uniform(-25, 25), np.random.uniform(-25, 25), np.random.uniform(-180, 180)]
     x = rotate_3d(x, rotations)
     x = random_scale_change(x, 0.8, 1.2)
     if np.random.uniform(0, 1) >= 0.5 and x.shape[0] > min_sample_points:
