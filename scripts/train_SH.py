@@ -373,7 +373,7 @@ if __name__ == "__main__":
         num_epochs=2000,
         learning_rate=0.000025,
         input_point_cloud=None,
-        model_filename="model_noterrain_Clon_EricCarl.pth",
+        model_filename="yosemite_test.pth",
         sample_box_size_m=np.array([6, 6, 6]),
         sample_box_overlap=[0.5, 0.5, 0.5],
         min_points_per_box=1000,
